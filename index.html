@@ -18,10 +18,13 @@
     <div class="app-shell">
       <header class="top-bar">
         <div>
-          <p class="eyebrow">Capital Market Tracker</p>
-          <h1>Portfolio</h1>
+          <p class="eyebrow">Portfolio</p>
+          <h1>Dashboard</h1>
         </div>
-        <button id="installBtn" class="ghost-btn" hidden>Install</button>
+        <div class="top-actions">
+          <button id="installBtn" class="ghost-btn" hidden>Install</button>
+          <button class="icon-fab" aria-label="Portfolio wallet">◍</button>
+        </div>
       </header>
 
       <main>
@@ -29,6 +32,7 @@
           <article class="hero-card">
             <p class="eyebrow">Latest Total</p>
             <h2 id="latestTotal">-</h2>
+            <p id="latestDelta" class="hero-delta">-</p>
             <p id="latestDate" class="subtle"></p>
           </article>
 
@@ -38,14 +42,30 @@
           </section>
 
           <section>
+            <div class="quick-actions">
+              <button class="quick-btn" data-screen-jump="add"><span>＋</span>Add Data</button>
+              <button class="quick-btn" id="quickExportBtn"><span>⇩</span>Export</button>
+              <button class="quick-btn" data-screen-jump="history"><span>◷</span>History</button>
+              <button class="quick-btn" data-screen-jump="settings"><span>⚙</span>Settings</button>
+            </div>
+          </section>
+
+          <section>
             <h3>Latest Allocation</h3>
             <div class="chart-card"><canvas id="allocationChart"></canvas></div>
           </section>
 
           <section>
-            <div class="section-head">
+            <div class="insight-card">
+              <p class="eyebrow">Insight</p>
+              <p id="insightText">-</p>
+            </div>
+          </section>
+
+          <section>
+            <div class="section-head recent-head">
               <h3>Recent Entries</h3>
-              <button id="homeExportBtn" class="ghost-btn">Export XLSX</button>
+              <button class="link-btn" data-screen-jump="history">View All</button>
             </div>
             <div id="recentEntries" class="list"></div>
           </section>

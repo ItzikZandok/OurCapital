@@ -24,9 +24,12 @@ const screenIds = ["home", "history", "add", "settings"];
 
 const els = {
   latestTotal: document.getElementById("latestTotal"),
+  latestDelta: document.getElementById("latestDelta"),
   latestDate: document.getElementById("latestDate"),
   institutionCards: document.getElementById("institutionCards"),
+  quickExportBtn: document.getElementById("quickExportBtn"),
   recentEntries: document.getElementById("recentEntries"),
+  insightText: document.getElementById("insightText"),
   historyList: document.getElementById("historyList"),
   detailDialog: document.getElementById("detailDialog"),
   detailBody: document.getElementById("detailBody"),
@@ -40,7 +43,6 @@ const els = {
   inputMor: document.getElementById("inputMor"),
   inputTotal: document.getElementById("inputTotal"),
   autoTotalHint: document.getElementById("autoTotalHint"),
-  homeExportBtn: document.getElementById("homeExportBtn"),
   historyExportBtn: document.getElementById("historyExportBtn"),
   settingsExportBtn: document.getElementById("settingsExportBtn"),
   settingsEntryCount: document.getElementById("settingsEntryCount"),
@@ -77,8 +79,12 @@ function attachEvents() {
     });
   });
 
-  [els.homeExportBtn, els.historyExportBtn, els.settingsExportBtn].forEach((btn) => {
+  [els.quickExportBtn, els.historyExportBtn, els.settingsExportBtn].forEach((btn) => {
     btn.addEventListener("click", exportXlsx);
+  });
+
+  document.querySelectorAll("[data-screen-jump]").forEach((btn) => {
+    btn.addEventListener("click", () => switchScreen(btn.dataset.screenJump));
   });
   els.resetDataBtn.addEventListener("click", resetToSeedData);
 
@@ -204,14 +210,22 @@ function renderAll() {
 function renderHome() {
   const latest = records[records.length - 1];
   if (!latest) return;
+  const prev = records[records.length - 2];
+  const delta = prev ? latest.total - prev.total : 0;
+  const deltaSign = delta >= 0 ? "+" : "-";
 
   els.latestTotal.textContent = formatValue(latest.total);
+  els.latestDelta.textContent = `${deltaSign}${formatValue(Math.abs(delta))} vs last entry`;
   els.latestDate.textContent = `As of ${latest.date}`;
+  els.insightText.textContent =
+    delta === 0
+      ? "Portfolio is unchanged since last entry."
+      : `Portfolio ${delta > 0 ? "gained" : "dropped"} ${formatValue(Math.abs(delta))} since last entry.`;
 
   const parts = [
-    { name: "Migdal", value: latest.migdal },
-    { name: "Fenix", value: latest.fenix },
-    { name: "Mor", value: latest.mor }
+    { name: "Migdal", value: latest.migdal, icon: "🏛" },
+    { name: "Fenix", value: latest.fenix, icon: "🏢" },
+    { name: "Mor", value: latest.mor, icon: "↗" }
   ];
 
   els.institutionCards.innerHTML = parts
@@ -219,7 +233,10 @@ function renderHome() {
       const pct = latest.total ? ((part.value / latest.total) * 100).toFixed(1) : "0.0";
       return `
       <article class="card">
-        <p class="eyebrow">${part.name}</p>
+        <div class="inst-head">
+          <span class="inst-icon">${part.icon}</span>
+          <p class="eyebrow">${part.name}</p>
+        </div>
         <p class="value">${formatValue(part.value)}</p>
         <p class="percent">${pct}%</p>
       </article>`;
