@@ -1,4 +1,4 @@
-const CACHE_NAME = "capital-portfolio-v1";
+const CACHE_NAME = "capital-portfolio-v2";
 const APP_ASSETS = ["./", "./index.html", "./styles.css", "./app.js", "./manifest.webmanifest", "./assets/icon.svg"];
 
 self.addEventListener("install", (event) => {
@@ -16,19 +16,23 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
 
-  event.respondWith(
-    caches.match(event.request).then((cached) => {
-      if (cached) return cached;
+  const requestUrl = new URL(event.request.url);
+  const isSameOrigin = requestUrl.origin === self.location.origin;
 
-      return fetch(event.request)
-        .then((response) => {
-          if (response.type === "basic" && response.status === 200) {
-            const copy = response.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
-          }
-          return response;
+  event.respondWith(
+    fetch(event.request)
+      .then((response) => {
+        if (isSameOrigin && response.type === "basic" && response.status === 200) {
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+        }
+        return response;
+      })
+      .catch(() =>
+        caches.match(event.request).then((cached) => {
+          if (cached) return cached;
+          return caches.match("./index.html");
         })
-        .catch(() => caches.match("./index.html"));
-    })
+      )
   );
 });
