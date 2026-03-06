@@ -1,0 +1,17 @@
+{
+  "name": "Capital Portfolio",
+  "short_name": "Portfolio",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#f4f5fb",
+  "theme_color": "#6f4dff",
+  "description": "Mobile-first finance PWA to track Migdal, Fenix, Mor and Total portfolio performance.",
+  "icons": [
+    {
+      "src": "assets/icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
