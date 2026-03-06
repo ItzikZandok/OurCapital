@@ -82,28 +82,49 @@
 
         <section id="screen-settings" class="screen">
           <div class="card settings-card">
-            <h3>Settings</h3>
+            <h3>Preferences</h3>
             <label class="toggle-row">
               <span>Auto-calculate Total</span>
               <input type="checkbox" id="autoCalcToggle" />
             </label>
-            <label class="toggle-row">
+            <label class="settings-field">
               <span>Currency Style</span>
               <select id="currencyStyle">
                 <option value="number">Number</option>
                 <option value="currency">ILS Currency</option>
               </select>
             </label>
+          </div>
+
+          <div class="card settings-card">
+            <h3>Data</h3>
+            <div class="settings-stats">
+              <div class="row"><span>Saved entries</span><strong id="settingsEntryCount">0</strong></div>
+              <div class="row"><span>Latest entry</span><strong id="settingsLatestDate">-</strong></div>
+            </div>
             <button id="settingsExportBtn" class="ghost-btn">Export XLSX</button>
+            <button id="resetDataBtn" class="danger-btn">Reset to Initial Data</button>
           </div>
         </section>
       </main>
 
       <nav class="bottom-nav">
-        <button class="nav-btn active" data-screen="home">Home</button>
-        <button class="nav-btn" data-screen="history">History</button>
-        <button class="nav-btn nav-add" data-screen="add">Add</button>
-        <button class="nav-btn" data-screen="settings">Settings</button>
+        <button class="nav-btn active" data-screen="home" aria-label="Home">
+          <span class="nav-icon">⌂</span>
+          <span class="nav-label">Home</span>
+        </button>
+        <button class="nav-btn" data-screen="history" aria-label="History">
+          <span class="nav-icon">◷</span>
+          <span class="nav-label">History</span>
+        </button>
+        <button class="nav-btn nav-add" data-screen="add" aria-label="Add">
+          <span class="nav-icon">＋</span>
+          <span class="nav-label">Add</span>
+        </button>
+        <button class="nav-btn" data-screen="settings" aria-label="Settings">
+          <span class="nav-icon">⚙</span>
+          <span class="nav-label">Settings</span>
+        </button>
       </nav>
     </div>
 

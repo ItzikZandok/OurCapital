@@ -43,6 +43,9 @@ const els = {
   homeExportBtn: document.getElementById("homeExportBtn"),
   historyExportBtn: document.getElementById("historyExportBtn"),
   settingsExportBtn: document.getElementById("settingsExportBtn"),
+  settingsEntryCount: document.getElementById("settingsEntryCount"),
+  settingsLatestDate: document.getElementById("settingsLatestDate"),
+  resetDataBtn: document.getElementById("resetDataBtn"),
   autoCalcToggle: document.getElementById("autoCalcToggle"),
   currencyStyle: document.getElementById("currencyStyle"),
   installBtn: document.getElementById("installBtn")
@@ -77,6 +80,7 @@ function attachEvents() {
   [els.homeExportBtn, els.historyExportBtn, els.settingsExportBtn].forEach((btn) => {
     btn.addEventListener("click", exportXlsx);
   });
+  els.resetDataBtn.addEventListener("click", resetToSeedData);
 
   els.autoCalcToggle.addEventListener("change", () => {
     settings.autoCalcTotal = els.autoCalcToggle.checked;
@@ -194,6 +198,7 @@ function renderAll() {
   renderHome();
   renderHistory();
   renderCharts();
+  renderSettings();
 }
 
 function renderHome() {
@@ -266,6 +271,12 @@ function renderHistory() {
   els.historyList.querySelectorAll(".delete-btn").forEach((btn) => {
     btn.addEventListener("click", () => removeEntry(btn.dataset.id));
   });
+}
+
+function renderSettings() {
+  const latest = records[records.length - 1];
+  els.settingsEntryCount.textContent = String(records.length);
+  els.settingsLatestDate.textContent = latest?.date || "-";
 }
 
 function renderCharts() {
@@ -372,6 +383,19 @@ function exportXlsx() {
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Portfolio");
   XLSX.writeFile(wb, `capital-portfolio-${new Date().toISOString().slice(0, 10)}.xlsx`);
+}
+
+function resetToSeedData() {
+  const confirmed = window.confirm("Reset all saved records back to the initial dataset?");
+  if (!confirmed) return;
+  records = seedData.map((entry) => ({
+    ...entry,
+    id: crypto.randomUUID?.() || String(Date.now() + Math.random())
+  }));
+  saveRecords();
+  resetForm();
+  renderAll();
+  switchScreen("home");
 }
 
 function loadRecords() {
