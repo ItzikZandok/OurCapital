@@ -38,6 +38,11 @@
           </section>
 
           <section>
+            <h3>Latest Allocation</h3>
+            <div class="chart-card"><canvas id="allocationChart"></canvas></div>
+          </section>
+
+          <section>
             <div class="section-head">
               <h3>Recent Entries</h3>
               <button id="homeExportBtn" class="ghost-btn">Export XLSX</button>
@@ -75,17 +80,6 @@
           </form>
         </section>
 
-        <section id="screen-analytics" class="screen">
-          <section>
-            <h3>Latest Allocation</h3>
-            <div class="chart-card"><canvas id="allocationChart"></canvas></div>
-          </section>
-          <section>
-            <h3>Total Over Time</h3>
-            <div class="chart-card"><canvas id="analyticsTrendChart"></canvas></div>
-          </section>
-        </section>
-
         <section id="screen-settings" class="screen">
           <div class="card settings-card">
             <h3>Settings</h3>
@@ -109,7 +103,6 @@
         <button class="nav-btn active" data-screen="home">Home</button>
         <button class="nav-btn" data-screen="history">History</button>
         <button class="nav-btn nav-add" data-screen="add">Add</button>
-        <button class="nav-btn" data-screen="analytics">Analytics</button>
         <button class="nav-btn" data-screen="settings">Settings</button>
       </nav>
     </div>

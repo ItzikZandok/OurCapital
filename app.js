@@ -17,11 +17,10 @@ let records = loadRecords();
 let settings = loadSettings();
 let editingId = null;
 let homeTrendChart;
-let analyticsTrendChart;
 let allocationChart;
 let deferredInstallPrompt;
 
-const screenIds = ["home", "history", "add", "analytics", "settings"];
+const screenIds = ["home", "history", "add", "settings"];
 
 const els = {
   latestTotal: document.getElementById("latestTotal"),
@@ -275,7 +274,6 @@ function renderCharts() {
   const latest = records[records.length - 1];
 
   homeTrendChart = renderLineChart(homeTrendChart, "homeTrendChart", labels, totals);
-  analyticsTrendChart = renderLineChart(analyticsTrendChart, "analyticsTrendChart", labels, totals);
 
   allocationChart = renderDonutChart(
     allocationChart,
