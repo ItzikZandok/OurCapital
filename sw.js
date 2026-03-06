@@ -1,4 +1,4 @@
-const CACHE_NAME = "capital-portfolio-v2";
+const CACHE_NAME = "capital-portfolio-v3";
 const APP_ASSETS = ["./", "./index.html", "./styles.css", "./app.js", "./manifest.webmanifest", "./assets/icon.svg"];
 
 self.addEventListener("install", (event) => {

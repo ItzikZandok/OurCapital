@@ -65,57 +65,68 @@ function attachEvents() {
     btn.addEventListener("click", () => switchScreen(btn.dataset.screen));
   });
 
-  els.entryForm.addEventListener("submit", onSubmit);
-  els.cancelEditBtn.addEventListener("click", resetForm);
-  els.closeDetailBtn.addEventListener("click", () => els.detailDialog.close());
+  if (els.entryForm) els.entryForm.addEventListener("submit", onSubmit);
+  if (els.cancelEditBtn) els.cancelEditBtn.addEventListener("click", resetForm);
+  if (els.closeDetailBtn) els.closeDetailBtn.addEventListener("click", () => els.detailDialog?.close());
 
   [els.inputMigdal, els.inputFenix, els.inputMor].forEach((input) => {
+    if (!input) return;
     input.addEventListener("input", () => {
-      if (settings.autoCalcTotal) {
-        els.inputTotal.value = sumFormParts();
+      if (settings.autoCalcTotal && els.inputTotal) {
+        els.inputTotal.value = String(sumFormParts());
       }
     });
   });
 
   [els.homeExportBtn, els.historyExportBtn, els.settingsExportBtn].forEach((btn) => {
+    if (!btn) return;
     btn.addEventListener("click", exportXlsx);
   });
-  els.resetDataBtn.addEventListener("click", resetToSeedData);
 
-  els.autoCalcToggle.addEventListener("change", () => {
-    settings.autoCalcTotal = els.autoCalcToggle.checked;
-    saveSettings();
-    applySettingsToUi();
-    if (settings.autoCalcTotal) {
-      els.inputTotal.value = sumFormParts();
-    }
-  });
+  if (els.resetDataBtn) els.resetDataBtn.addEventListener("click", resetToSeedData);
 
-  els.currencyStyle.addEventListener("change", () => {
-    settings.currencyStyle = els.currencyStyle.value;
-    saveSettings();
-    renderAll();
-  });
+  if (els.autoCalcToggle) {
+    els.autoCalcToggle.addEventListener("change", () => {
+      settings.autoCalcTotal = els.autoCalcToggle.checked;
+      saveSettings();
+      applySettingsToUi();
+      if (settings.autoCalcTotal && els.inputTotal) {
+        els.inputTotal.value = String(sumFormParts());
+      }
+    });
+  }
+
+  if (els.currencyStyle) {
+    els.currencyStyle.addEventListener("change", () => {
+      settings.currencyStyle = els.currencyStyle.value;
+      saveSettings();
+      renderAll();
+    });
+  }
 
   window.addEventListener("beforeinstallprompt", (event) => {
     event.preventDefault();
     deferredInstallPrompt = event;
-    els.installBtn.hidden = false;
+    if (els.installBtn) els.installBtn.hidden = false;
   });
 
-  els.installBtn.addEventListener("click", async () => {
-    if (!deferredInstallPrompt) return;
-    deferredInstallPrompt.prompt();
-    await deferredInstallPrompt.userChoice;
-    deferredInstallPrompt = null;
-    els.installBtn.hidden = true;
-  });
+  if (els.installBtn) {
+    els.installBtn.addEventListener("click", async () => {
+      if (!deferredInstallPrompt) return;
+      deferredInstallPrompt.prompt();
+      await deferredInstallPrompt.userChoice;
+      deferredInstallPrompt = null;
+      els.installBtn.hidden = true;
+    });
+  }
 }
 
 function switchScreen(screenName) {
   screenIds.forEach((name) => {
-    document.getElementById(`screen-${name}`).classList.toggle("active", name === screenName);
+    const section = document.getElementById(`screen-${name}`);
+    if (section) section.classList.toggle("active", name === screenName);
   });
+
   document.querySelectorAll(".nav-btn").forEach((btn) => {
     btn.classList.toggle("active", btn.dataset.screen === screenName);
   });
@@ -126,11 +137,11 @@ function onSubmit(event) {
 
   const next = {
     id: editingId || crypto.randomUUID?.() || String(Date.now()),
-    date: isoToDisplayDate(els.inputDate.value),
-    migdal: Number(els.inputMigdal.value),
-    fenix: Number(els.inputFenix.value),
-    mor: Number(els.inputMor.value),
-    total: Number(els.inputTotal.value)
+    date: isoToDisplayDate(els.inputDate?.value || ""),
+    migdal: Number(els.inputMigdal?.value || 0),
+    fenix: Number(els.inputFenix?.value || 0),
+    mor: Number(els.inputMor?.value || 0),
+    total: Number(els.inputTotal?.value || 0)
   };
 
   if (!next.date || Number.isNaN(next.total)) return;
@@ -153,13 +164,13 @@ function startEdit(id) {
   if (!item) return;
 
   editingId = id;
-  els.formTitle.textContent = "Edit Entry";
-  els.cancelEditBtn.hidden = false;
-  els.inputDate.value = displayDateToIso(item.date);
-  els.inputMigdal.value = item.migdal;
-  els.inputFenix.value = item.fenix;
-  els.inputMor.value = item.mor;
-  els.inputTotal.value = item.total;
+  if (els.formTitle) els.formTitle.textContent = "Edit Entry";
+  if (els.cancelEditBtn) els.cancelEditBtn.hidden = false;
+  if (els.inputDate) els.inputDate.value = displayDateToIso(item.date);
+  if (els.inputMigdal) els.inputMigdal.value = String(item.migdal);
+  if (els.inputFenix) els.inputFenix.value = String(item.fenix);
+  if (els.inputMor) els.inputMor.value = String(item.mor);
+  if (els.inputTotal) els.inputTotal.value = String(item.total);
   switchScreen("add");
 }
 
@@ -171,7 +182,7 @@ function removeEntry(id) {
 
 function openDetail(id) {
   const item = records.find((entry) => entry.id === id);
-  if (!item) return;
+  if (!item || !els.detailBody || !els.detailDialog) return;
 
   els.detailBody.innerHTML = `
     <div class="detail-grid">
@@ -187,9 +198,9 @@ function openDetail(id) {
 
 function resetForm() {
   editingId = null;
-  els.entryForm.reset();
-  els.formTitle.textContent = "Add Entry";
-  els.cancelEditBtn.hidden = true;
+  if (els.entryForm) els.entryForm.reset();
+  if (els.formTitle) els.formTitle.textContent = "Add Entry";
+  if (els.cancelEditBtn) els.cancelEditBtn.hidden = true;
   applySettingsToUi();
 }
 
@@ -203,7 +214,7 @@ function renderAll() {
 
 function renderHome() {
   const latest = records[records.length - 1];
-  if (!latest) return;
+  if (!latest || !els.latestTotal || !els.latestDate || !els.institutionCards || !els.recentEntries) return;
 
   els.latestTotal.textContent = formatValue(latest.total);
   els.latestDate.textContent = `As of ${latest.date}`;
@@ -242,6 +253,8 @@ function renderHome() {
 }
 
 function renderHistory() {
+  if (!els.historyList) return;
+
   els.historyList.innerHTML = [...records]
     .reverse()
     .map(
@@ -275,8 +288,8 @@ function renderHistory() {
 
 function renderSettings() {
   const latest = records[records.length - 1];
-  els.settingsEntryCount.textContent = String(records.length);
-  els.settingsLatestDate.textContent = latest?.date || "-";
+  if (els.settingsEntryCount) els.settingsEntryCount.textContent = String(records.length);
+  if (els.settingsLatestDate) els.settingsLatestDate.textContent = latest?.date || "-";
 }
 
 function renderCharts() {
@@ -285,7 +298,6 @@ function renderCharts() {
   const latest = records[records.length - 1];
 
   homeTrendChart = renderLineChart(homeTrendChart, "homeTrendChart", labels, totals);
-
   allocationChart = renderDonutChart(
     allocationChart,
     "allocationChart",
@@ -295,9 +307,11 @@ function renderCharts() {
 
 function renderLineChart(chart, canvasId, labels, values) {
   if (!window.Chart) return chart;
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return chart;
   chart?.destroy();
 
-  return new Chart(document.getElementById(canvasId), {
+  return new Chart(canvas, {
     type: "line",
     data: {
       labels,
@@ -321,18 +335,10 @@ function renderLineChart(chart, canvasId, labels, values) {
       plugins: { legend: { display: false } },
       scales: {
         y: {
-          ticks: {
-            callback: (v) => shortNumber(v)
-          },
-          grid: {
-            color: "rgba(120,120,160,0.14)"
-          }
+          ticks: { callback: (v) => shortNumber(v) },
+          grid: { color: "rgba(120,120,160,0.14)" }
         },
-        x: {
-          grid: {
-            display: false
-          }
-        }
+        x: { grid: { display: false } }
       }
     }
   });
@@ -340,29 +346,21 @@ function renderLineChart(chart, canvasId, labels, values) {
 
 function renderDonutChart(chart, canvasId, values) {
   if (!window.Chart) return chart;
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return chart;
   chart?.destroy();
-  return new Chart(document.getElementById(canvasId), {
+
+  return new Chart(canvas, {
     type: "doughnut",
     data: {
       labels: ["Migdal", "Fenix", "Mor"],
-      datasets: [
-        {
-          data: values,
-          backgroundColor: ["#6f4dff", "#9f73ff", "#d4c5ff"],
-          borderWidth: 0
-        }
-      ]
+      datasets: [{ data: values, backgroundColor: ["#6f4dff", "#9f73ff", "#d4c5ff"], borderWidth: 0 }]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
       cutout: "65%",
-      plugins: {
-        legend: {
-          position: "bottom",
-          labels: { usePointStyle: true }
-        }
-      }
+      plugins: { legend: { position: "bottom", labels: { usePointStyle: true } } }
     }
   });
 }
@@ -377,9 +375,7 @@ function exportXlsx() {
     Total: entry.total
   }));
 
-  const ws = XLSX.utils.json_to_sheet(rows, {
-    header: ["Date", "Migdal", "Fenix", "Mor", "Total"]
-  });
+  const ws = XLSX.utils.json_to_sheet(rows, { header: ["Date", "Migdal", "Fenix", "Mor", "Total"] });
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Portfolio");
   XLSX.writeFile(wb, `capital-portfolio-${new Date().toISOString().slice(0, 10)}.xlsx`);
@@ -388,10 +384,12 @@ function exportXlsx() {
 function resetToSeedData() {
   const confirmed = window.confirm("Reset all saved records back to the initial dataset?");
   if (!confirmed) return;
+
   records = seedData.map((entry) => ({
     ...entry,
     id: crypto.randomUUID?.() || String(Date.now() + Math.random())
   }));
+
   saveRecords();
   resetForm();
   renderAll();
@@ -431,18 +429,20 @@ function saveSettings() {
 }
 
 function applySettingsToUi() {
-  els.autoCalcToggle.checked = !!settings.autoCalcTotal;
-  els.currencyStyle.value = settings.currencyStyle;
-  els.inputTotal.readOnly = !!settings.autoCalcTotal;
-  els.autoTotalHint.textContent = settings.autoCalcTotal
-    ? "Total updates automatically from Migdal + Fenix + Mor"
-    : "Total can be entered manually";
+  if (els.autoCalcToggle) els.autoCalcToggle.checked = !!settings.autoCalcTotal;
+  if (els.currencyStyle) els.currencyStyle.value = settings.currencyStyle;
+  if (els.inputTotal) els.inputTotal.readOnly = !!settings.autoCalcTotal;
+  if (els.autoTotalHint) {
+    els.autoTotalHint.textContent = settings.autoCalcTotal
+      ? "Total updates automatically from Migdal + Fenix + Mor"
+      : "Total can be entered manually";
+  }
 }
 
 function sumFormParts() {
-  const m = Number(els.inputMigdal.value) || 0;
-  const f = Number(els.inputFenix.value) || 0;
-  const mor = Number(els.inputMor.value) || 0;
+  const m = Number(els.inputMigdal?.value) || 0;
+  const f = Number(els.inputFenix?.value) || 0;
+  const mor = Number(els.inputMor?.value) || 0;
   return m + f + mor;
 }
 
